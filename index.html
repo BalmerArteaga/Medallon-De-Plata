@@ -1,0 +1,660 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Medallón de Plata | Preparación física</title>
+<style>
+:root {
+  --azul: #123b68;
+  --azul2: #2468a8;
+  --fondo: #f1f5fa;
+  --verde: #18845b;
+  --texto: #233247;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--fondo);
+  color: var(--texto);
+  line-height: 1.5;
+}
+header {
+  background: linear-gradient(135deg, #102b4e, #2678b8);
+  color: white;
+  padding: 28px 18px;
+  text-align: center;
+}
+header h1 { margin: 0 0 8px; }
+header p { margin: 0; }
+main { max-width: 1000px; margin: auto; padding: 18px; }
+.panel, .session, .exercise {
+  background: white;
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 16px;
+  box-shadow: 0 3px 12px #152b4510;
+}
+h2, h3 { color: var(--azul); margin-top: 0; }
+label { display: block; font-weight: bold; margin: 10px 0 5px; }
+input, select {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 16px;
+  background: white;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+}
+button, .video-link {
+  display: inline-block;
+  border: 0;
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+}
+.primary { background: var(--azul2); color: white; }
+.video-link { background: #e6f2ff; color: #124c83; }
+.complete { background: #e2f6e9; color: #11633d; }
+button:hover, .video-link:hover { filter: brightness(.95); }
+.muted { color: #617086; font-size: 14px; }
+.progress-bg {
+  height: 12px;
+  background: #e0e7ef;
+  border-radius: 20px;
+  overflow: hidden;
+}
+#progressBar {
+  height: 100%;
+  width: 0;
+  background: var(--verde);
+  transition: width .2s;
+}
+.week-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.week-buttons button { background: #e4edf7; color: var(--azul); }
+.week-buttons button.active { background: var(--azul); color: white; }
+.exercise { border: 1px solid #e5ebf2; box-shadow: none; }
+.exercise h4 { margin: 0 0 6px; font-size: 17px; }
+.exercise p { margin: 5px 0 10px; }
+.exercise-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.notice {
+  background: #fff5d9;
+  border-left: 4px solid #e6a51a;
+  padding: 12px;
+  border-radius: 7px;
+}
+footer { text-align: center; padding: 20px; color: #617086; }
+
+/* Ventana emergente del video */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  inset: 0;
+  background: rgba(8, 20, 38, .82);
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.modal.show { display: flex; }
+.modal-content {
+  background: white;
+  width: 100%;
+  max-width: 720px;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 15px 50px rgba(0,0,0,.35);
+  max-height: 92vh;
+  overflow-y: auto;
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.modal-header h3 { margin: 0; }
+.close-modal {
+  background: #e8edf3;
+  color: #203047;
+  font-size: 20px;
+  min-width: 42px;
+  min-height: 42px;
+}
+.video-container {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.video-container iframe { width: 100%; height: 100%; border: 0; }
+.video-fallback { margin-top: 12px; }
+.video-fallback a { color: #125a99; }
+@media (max-width: 500px) {
+  .modal-content { padding: 12px; }
+  .week-buttons { grid-template-columns: repeat(2, 1fr); }
+}
+@media print {
+  button, .video-link, .week-buttons, #profilePanel, .modal {
+    display: none !important;
+  }
+  body { background: white; }
+  .panel, .session, .exercise {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🏅 Medallón de Plata</h1>
+  <p>Plan personal de preparación · 16 semanas</p>
+  <p>Domingos · Lunes · Jueves</p>
+</header>
+
+<main>
+  <section class="panel" id="profilePanel">
+    <h2>1. Tu perfil físico</h2>
+    <p class="muted">Completa tus datos para adaptar las recomendaciones.</p>
+
+    <div class="grid">
+      <div>
+        <label for="age">Edad (años)</label>
+        <input id="age" type="number" min="5" max="100" placeholder="Ej. 29">
+      </div>
+      <div>
+        <label for="height">Estatura (cm)</label>
+        <input id="height" type="number" min="50" max="250" placeholder="Ej. 170">
+      </div>
+      <div>
+        <label for="habit">¿Haces ejercicio regularmente?</label>
+        <select id="habit">
+          <option value="no">No, estoy empezando</option>
+          <option value="sometimes">A veces</option>
+          <option value="yes">Sí, con frecuencia</option>
+        </select>
+      </div>
+      <div>
+        <label for="running">¿Puedes trotar 10 minutos?</label>
+        <select id="running">
+          <option value="no">No todavía</option>
+          <option value="some">Con pausas</option>
+          <option value="yes">Sí, cómodamente</option>
+        </select>
+      </div>
+      <div>
+        <label for="swimming">¿Sabes nadar?</label>
+        <select id="swimming">
+          <option value="no">No sé nadar</option>
+          <option value="basic">Estoy aprendiendo</option>
+          <option value="yes">Sí, sé nadar</option>
+        </select>
+      </div>
+      <div>
+        <label for="place">Lugar de entrenamiento</label>
+        <select id="place">
+          <option value="both">Parque y casa</option>
+          <option value="home">Solo en casa</option>
+          <option value="gym">Gimnasio o cancha</option>
+        </select>
+      </div>
+      <div>
+        <label for="limitation">¿Tienes alguna lesión o limitación?</label>
+        <select id="limitation">
+          <option value="no">No</option>
+          <option value="yes">Sí, necesito adaptar ejercicios</option>
+        </select>
+      </div>
+    </div>
+
+    <p style="margin-top:16px">
+      <button class="primary" onclick="saveProfile()">
+        Guardar perfil y adaptar rutina
+      </button>
+    </p>
+    <div id="recommendation" aria-live="polite"></div>
+  </section>
+
+  <section class="panel">
+    <h2>2. Tu progreso</h2>
+    <p id="progressText">0 ejercicios completados</p>
+    <div class="progress-bg"><div id="progressBar"></div></div>
+    <p class="muted">El progreso se guarda en este navegador.</p>
+  </section>
+
+  <section class="panel">
+    <h2>3. Selecciona una semana</h2>
+    <div class="week-buttons" id="weeks"></div>
+    <p id="phase" class="muted"></p>
+  </section>
+
+  <section id="routine"></section>
+
+  <section class="panel">
+    <h2>Seguridad y preparación</h2>
+    <div class="notice">
+      <strong>Importante:</strong> empieza despacio y descansa cuando lo necesites.
+      Si sientes dolor fuerte, mareo, dolor en el pecho o falta de aire inusual,
+      detén el ejercicio.
+    </div>
+    <ul>
+      <li>Calienta durante 5–10 minutos y termina con movilidad suave.</li>
+      <li>No intentes compensar sesiones perdidas haciendo el doble.</li>
+      <li>No practiques natación solo ni entres en agua profunda si no sabes nadar. Aprende con instructor y supervisión directa.</li>
+      <li>Si tienes una lesión o limitación, consulta con un profesional de salud antes de aumentar la carga.</li>
+      <li>Este plan es orientativo. Confirma las pruebas y marcas oficiales vigentes con tu director de Guías Mayores.</li>
+    </ul>
+    <button class="primary" onclick="window.print()">Imprimir / Guardar como PDF</button>
+    <button onclick="resetProgress()">Reiniciar progreso</button>
+  </section>
+</main>
+
+<!-- Ventana emergente: el video aparece dentro de la aplicación -->
+<div id="videoModal" class="modal" aria-hidden="true">
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="videoTitle">
+    <div class="modal-header">
+      <h3 id="videoTitle">Video del ejercicio</h3>
+      <button type="button" class="close-modal" onclick="closeVideo()" aria-label="Cerrar video">✕</button>
+    </div>
+
+    <div class="video-container">
+      <iframe
+        id="videoFrame"
+        src=""
+        title="Demostración del ejercicio"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerpolicy="strict-origin-when-cross-origin"
+        allowfullscreen>
+      </iframe>
+    </div>
+
+    <p class="muted">
+      Si el reproductor no carga, puede que YouTube no permita insertar esa búsqueda.
+      Puedes usar el enlace alternativo.
+    </p>
+    <p>
+      <a id="youtubeFallback" href="#" target="_blank" rel="noopener noreferrer">
+        Abrir búsqueda en YouTube si falla la reproducción
+      </a>
+    </p>
+  </div>
+</div>
+
+<footer>Plan personal de preparación · Medallón de Plata</footer>
+
+<script>
+const exercises = {
+  walk: {
+    name: "Caminata activa",
+    detail: "Camina a un ritmo que te permita hablar sin quedarte sin aire.",
+    video: "caminata activa técnica principiantes"
+  },
+  warm: {
+    name: "Calentamiento articular",
+    detail: "Moviliza hombros, brazos, caderas, rodillas y tobillos suavemente.",
+    video: "calentamiento articular principiantes educación física"
+  },
+  squat: {
+    name: "Sentadilla a una silla",
+    detail: "Lleva la cadera hacia atrás y levántate de forma controlada.",
+    video: "sentadilla a una silla principiantes técnica"
+  },
+  wallpush: {
+    name: "Flexiones contra la pared",
+    detail: "Mantén el cuerpo alineado y acerca el pecho a la pared controladamente.",
+    video: "flexiones contra la pared principiantes técnica"
+  },
+  bridge: {
+    name: "Puente de glúteos",
+    detail: "Acostado boca arriba, eleva la cadera sin arquear excesivamente la espalda.",
+    video: "puente de glúteos principiantes técnica"
+  },
+  plank: {
+    name: "Plancha con rodillas apoyadas",
+    detail: "Mantén el abdomen activo y la espalda alineada; empieza con intervalos cortos.",
+    video: "plancha con rodillas apoyadas principiantes"
+  },
+  march: {
+    name: "Marcha elevando las rodillas",
+    detail: "Marcha en el sitio, levantando las rodillas a una altura cómoda.",
+    video: "marcha elevando rodillas ejercicio principiantes"
+  },
+  balance: {
+    name: "Equilibrio sobre un pie",
+    detail: "Apóyate cerca de una pared o silla estable por seguridad.",
+    video: "ejercicio equilibrio un pie principiantes"
+  },
+  step: {
+    name: "Subir y bajar un escalón bajo",
+    detail: "Usa un escalón firme, bajo y antideslizante. No lo hagas si te causa dolor.",
+    video: "subir bajar escalón bajo ejercicio principiantes"
+  },
+  jog: {
+    name: "Trote suave o caminar-trotar",
+    detail: "Alterna trote suave y caminata. Si aún no puedes trotar, camina.",
+    video: "cómo empezar a correr desde cero principiantes"
+  },
+  side: {
+    name: "Pasos laterales",
+    detail: "Da pasos controlados a ambos lados sin cruzar los pies.",
+    video: "pasos laterales ejercicio coordinación principiantes"
+  },
+  stretch: {
+    name: "Movilidad y estiramiento suave",
+    detail: "Haz movimientos cómodos, sin rebotes ni dolor.",
+    video: "estiramientos suaves después de entrenar principiantes"
+  },
+  swim: {
+    name: "Familiarización acuática con instructor",
+    detail: "Solo con instructor cualificado y supervisión directa. No practiques solo ni en agua profunda.",
+    video: "seguridad acuática principiantes aprendizaje natación"
+  },
+  breathing: {
+    name: "Respiración y confianza en el agua",
+    detail: "Aprende en zona segura y poco profunda con instructor; no fuerces la inmersión.",
+    video: "primeras clases natación principiantes seguridad"
+  },
+  rest: {
+    name: "Recuperación activa",
+    detail: "Camina tranquilamente o realiza movilidad suave según te sientas.",
+    video: "recuperación activa movilidad suave"
+  }
+};
+
+const sessions = [
+  {
+    day: "Domingo",
+    title: "Resistencia cardiovascular",
+    items: ["warm", "walk", "march", "stretch"]
+  },
+  {
+    day: "Lunes",
+    title: "Fuerza básica",
+    items: ["warm", "squat", "wallpush", "bridge", "plank", "stretch"]
+  },
+  {
+    day: "Jueves",
+    title: "Agilidad, equilibrio y habilidades",
+    items: ["warm", "balance", "side", "step", "stretch"]
+  }
+];
+
+let currentWeek = 1;
+let completed = JSON.parse(localStorage.getItem("silverCompleted") || "{}");
+
+function getPhase(week) {
+  if (week <= 4) return { title: "Fase 1: Adaptación", rounds: 1, seconds: 20 };
+  if (week <= 8) return { title: "Fase 2: Desarrollo", rounds: 2, seconds: 25 };
+  if (week <= 12) return { title: "Fase 3: Preparación específica", rounds: 2, seconds: 30 };
+  return { title: "Fase 4: Consolidación y evaluación", rounds: 2, seconds: 30 };
+}
+
+function saveProfile() {
+  const age = Number(document.getElementById("age").value);
+  const height = Number(document.getElementById("height").value);
+  const habit = document.getElementById("habit").value;
+  const running = document.getElementById("running").value;
+  const swimming = document.getElementById("swimming").value;
+  const limitation = document.getElementById("limitation").value;
+
+  if (age && (age < 5 || age > 100)) {
+    alert("Verifica la edad ingresada.");
+    return;
+  }
+  if (height && (height < 50 || height > 250)) {
+    alert("Verifica la estatura en centímetros.");
+    return;
+  }
+
+  const profile = {
+    age, height, habit, running, swimming, limitation,
+    place: document.getElementById("place").value
+  };
+  localStorage.setItem("silverProfile", JSON.stringify(profile));
+
+  let message = "<h3>Tu recomendación inicial</h3><ul>";
+
+  if (habit === "no") {
+    message += "<li>Comienza con una ronda y movimientos suaves; descansa cuando lo necesites.</li>";
+  } else if (habit === "sometimes") {
+    message += "<li>Empieza con una o dos rondas según tu tolerancia y técnica.</li>";
+  } else {
+    message += "<li>Progresa gradualmente, aunque ya entrenes con frecuencia.</li>";
+  }
+
+  if (running === "no") {
+    message += "<li>Prioriza caminar. No es necesario trotar antes de estar preparado.</li>";
+  } else if (running === "some") {
+    message += "<li>Alterna caminata y trote suave, sin forzar el ritmo.</li>";
+  } else {
+    message += "<li>Usa un ritmo cómodo y aumenta la duración gradualmente.</li>";
+  }
+
+  if (swimming === "no") {
+    message += "<li>Aprende natación presencialmente y bajo supervisión; no practiques solo.</li>";
+  } else if (swimming === "basic") {
+    message += "<li>Continúa las clases supervisadas antes de practicar distancias.</li>";
+  } else {
+    message += "<li>Practica en un lugar seguro y no aumentes distancias de golpe.</li>";
+  }
+
+  if (limitation === "yes") {
+    message += "<li><strong>Antes de entrenar:</strong> adapta los movimientos con un profesional de salud o entrenador cualificado.</li>";
+  }
+
+  message += "</ul><p class='muted'>La edad y la estatura no bastan para evaluar la aptitud física. Estas sugerencias no sustituyen una valoración profesional.</p>";
+  document.getElementById("recommendation").innerHTML = message;
+  renderRoutine();
+}
+
+function loadProfile() {
+  const p = JSON.parse(localStorage.getItem("silverProfile") || "null");
+  if (!p) return;
+  document.getElementById("age").value = p.age || "";
+  document.getElementById("height").value = p.height || "";
+  document.getElementById("habit").value = p.habit || "no";
+  document.getElementById("running").value = p.running || "no";
+  document.getElementById("swimming").value = p.swimming || "no";
+  document.getElementById("limitation").value = p.limitation || "no";
+  document.getElementById("place").value = p.place || "both";
+  saveProfile();
+}
+
+function renderWeeks() {
+  const container = document.getElementById("weeks");
+  container.innerHTML = "";
+  for (let i = 1; i <= 16; i++) {
+    const button = document.createElement("button");
+    button.textContent = "Semana " + i;
+    button.className = i === currentWeek ? "active" : "";
+    button.onclick = () => {
+      currentWeek = i;
+      renderWeeks();
+      renderRoutine();
+    };
+    container.appendChild(button);
+  }
+}
+
+function renderRoutine() {
+  const phase = getPhase(currentWeek);
+  document.getElementById("phase").textContent =
+    phase.title + " · Semana " + currentWeek + " de 16";
+
+  const p = JSON.parse(localStorage.getItem("silverProfile") || "{}");
+  const habit = p.habit || "no";
+  const running = p.running || "no";
+  const swimming = p.swimming || "no";
+  const limitation = p.limitation || "no";
+  const container = document.getElementById("routine");
+  container.innerHTML = "<h2>4. Rutina de la semana " + currentWeek + "</h2>";
+
+  sessions.forEach((session, sessionIndex) => {
+    const section = document.createElement("section");
+    section.className = "session";
+    section.innerHTML =
+      "<h3>" + session.day + " · " + session.title + "</h3>" +
+      "<p class='muted'>Duración orientativa: hasta 60 minutos, incluyendo calentamiento, pausas y vuelta a la calma. Descansa según lo necesites.</p>";
+
+    const items = [...session.items];
+
+    if (sessionIndex === 0) {
+      if (running !== "no" && currentWeek >= 5) items.splice(2, 0, "jog");
+      if (running === "no") items.push("rest");
+    }
+    if (sessionIndex === 2 && swimming !== "yes") {
+      items.push("breathing", "swim");
+    }
+
+    items.forEach((id, index) => {
+      const ex = exercises[id];
+      const taskId = "w" + currentWeek + "_" + sessionIndex + "_" + index;
+      const isDone = !!completed[taskId];
+      let dosage;
+
+      if (["walk", "jog"].includes(id)) {
+        dosage = currentWeek <= 4
+          ? "10–15 minutos a ritmo cómodo."
+          : "15–25 minutos según tu condición; alterna caminar y trotar si corresponde.";
+      } else if (["warm", "stretch", "rest"].includes(id)) {
+        dosage = "5–10 minutos suaves.";
+      } else if (["swim", "breathing"].includes(id)) {
+        dosage = "Solo con instructor y supervisión directa.";
+      } else {
+        dosage = phase.rounds + " ronda(s), " + phase.seconds +
+          " segundos o 6–10 repeticiones controladas. Descansa entre ejercicios.";
+      }
+
+      if (habit === "no" && currentWeek <= 4 &&
+          !["walk", "warm", "stretch", "rest", "swim", "breathing"].includes(id)) {
+        dosage = "Una ronda, pocas repeticiones cómodas y descanso suficiente.";
+      }
+      if (limitation === "yes" &&
+          !["warm", "stretch", "rest"].includes(id)) {
+        dosage = "Consulta una alternativa segura antes de realizar este ejercicio.";
+      }
+
+      const card = document.createElement("article");
+      card.className = "exercise";
+
+      const title = document.createElement("h4");
+      title.textContent = ex.name;
+      const detail = document.createElement("p");
+      detail.textContent = ex.detail;
+      const dose = document.createElement("p");
+      const strong = document.createElement("strong");
+      strong.textContent = "Orientación: ";
+      dose.append(strong, document.createTextNode(dosage));
+
+      const actions = document.createElement("div");
+      actions.className = "exercise-actions";
+
+      const videoButton = document.createElement("button");
+      videoButton.className = "video-link";
+      videoButton.type = "button";
+      videoButton.textContent = "▶ Ver video";
+      videoButton.addEventListener("click", () => openVideo(id));
+
+      const doneButton = document.createElement("button");
+      doneButton.className = isDone ? "complete" : "";
+      doneButton.textContent = isDone ? "✓ Completado" : "Marcar completado";
+      doneButton.addEventListener("click", () => toggleDone(taskId));
+
+      actions.append(videoButton, doneButton);
+      card.append(title, detail, dose, actions);
+      section.appendChild(card);
+    });
+
+    container.appendChild(section);
+  });
+
+  updateProgress();
+}
+
+/*
+  Abre una ventana modal con un reproductor de YouTube.
+  Nota: YouTube no ofrece reproducción integrada fiable de búsquedas.
+  Para garantizar un video concreto, configura un ID de video por ejercicio.
+*/
+function openVideo(id) {
+  const ex = exercises[id];
+  if (!ex) return;
+
+  const query = encodeURIComponent(ex.video);
+  const modal = document.getElementById("videoModal");
+  const frame = document.getElementById("videoFrame");
+
+  document.getElementById("videoTitle").textContent = ex.name;
+  document.getElementById("youtubeFallback").href =
+    "https://www.youtube.com/results?search_query=" + query;
+
+  // Se intenta reproducir dentro de la ventana emergente.
+  frame.src = "https://www.youtube.com/embed?listType=search&list=" + query;
+
+  modal.classList.add("show");
+  modal.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+  document.querySelector(".close-modal").focus();
+}
+
+function closeVideo() {
+  const modal = document.getElementById("videoModal");
+  modal.classList.remove("show");
+  modal.setAttribute("aria-hidden", "true");
+  document.getElementById("videoFrame").src = "";
+  document.body.style.overflow = "";
+}
+
+document.getElementById("videoModal").addEventListener("click", function(event) {
+  if (event.target === this) closeVideo();
+});
+document.addEventListener("keydown", function(event) {
+  if (event.key === "Escape") closeVideo();
+});
+
+function toggleDone(id) {
+  completed[id] = !completed[id];
+  localStorage.setItem("silverCompleted", JSON.stringify(completed));
+  renderRoutine();
+}
+
+function updateProgress() {
+  const total = 16 * sessions.reduce((sum, session) => sum + session.items.length, 0);
+  const done = Object.values(completed).filter(Boolean).length;
+  const percent = Math.min(100, Math.round(done / total * 100));
+  document.getElementById("progressBar").style.width = percent + "%";
+  document.getElementById("progressText").textContent =
+    done + " ejercicios registrados como completados · " + percent + "% de referencia";
+}
+
+function resetProgress() {
+  if (!confirm("¿Deseas borrar todo el registro de ejercicios completados?")) return;
+  completed = {};
+  localStorage.removeItem("silverCompleted");
+  renderRoutine();
+}
+
+renderWeeks();
+renderRoutine();
+loadProfile();
+</script>
+</body>
+</html>
